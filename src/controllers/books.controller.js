@@ -1,29 +1,41 @@
 const db = require("../models");
-const Book = db.Books; 
+const Book = db.Books;
+const Type = db.type;
+const {
+  validateCreateBook,
+  validateUpdateBook,
+} = require("../utils/bookValidation");
 
 // Fonction qui vérifie et convertit un id provenant des paramètres d'URL
 function parseId(params) {
+  // On récupère params.id (qui est une string) et on le convertit en nombre
+  const id = Number(params.id);
 
-    // On récupère params.id (qui est une string) et on le convertit en nombre
-    const id = Number(params.id);
+  // Si l'id n'est pas un entier OU s'il est inférieur ou égal à 0,
+  // alors ce n'est pas un identifiant valide
+  if (!Number.isInteger(id) || id <= 0) {
+    // On retourne null pour indiquer une valeur invalide
+    return null;
+  }
 
-    // Si l'id n'est pas un entier OU s'il est inférieur ou égal à 0,
-    // alors ce n'est pas un identifiant valide
-    if (!Number.isInteger(id) || id <= 0) {
-        // On retourne null pour indiquer une valeur invalide
-        return null;
-    }
-
-    // Si l'id est un entier positif, on le retourne
-    return id;
+  // Si l'id est un entier positif, on le retourne
+  return id;
 }
-
 
 // Liste de tous les livres
 exports.listBooks = async (req, res) => {
   try {
-    const books = await Book.findAll();
-
+    const books = await Book.findAll({
+      order: [["title", "ASC"]],
+      //on inclue le nom du type dans la view
+      include: [
+        {
+          model: Type,
+          as: "type",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
     return res.status(200).json({
       success: true,
       message: "liste des livres",
@@ -44,7 +56,15 @@ exports.getBookById = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    const book = await Book.findByPk(id);
+      const book = await Book.findByPk(id, {
+      include: [{
+        model: Type,
+        as: 'type',
+        attributes: ['id', 'name']
+      }]
+       });
+    
+
 
     if (!book) {
       return res.status(404).json({
@@ -88,7 +108,6 @@ exports.createBook = async (req, res) => {
       title: title,
       author: author,
       type_id: type_id,
-      
     });
 
     return res.status(201).json({
@@ -110,7 +129,7 @@ exports.createBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { title, dispo,type_id } = req.body;
+    const { title, dispo, type_id } = req.body;
 
     const book = await Book.findByPk(id);
 
@@ -125,7 +144,7 @@ exports.updateBook = async (req, res) => {
     // appliquer les modifications
     if (title !== undefined) book.title = title;
     if (dispo !== undefined) book.dispo = dispo;
-    if(type_id !== undefined)book.type_id = type_id;
+    if (type_id !== undefined) book.type_id = type_id;
 
     await book.save();
 
