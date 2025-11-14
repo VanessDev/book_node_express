@@ -1,6 +1,7 @@
 const db = require("../models");
 const Book = db.Books;
-const Type = db.type;
+const Type = db.Type;
+
 const {
   validateCreateBook,
   validateUpdateBook,
@@ -27,15 +28,17 @@ exports.listBooks = async (req, res) => {
   try {
     const books = await Book.findAll({
       order: [["title", "ASC"]],
-      //on inclue le nom du type dans la view
+      // on inclut le type du livre dans la réponse
       include: [
         {
           model: Type,
           as: "type",
-          attributes: ["id", "name"],
+          // champs qu’on renvoie pour le type
+          attributes: ["id", "Name"], 
         },
       ],
     });
+
     return res.status(200).json({
       success: true,
       message: "liste des livres",
@@ -54,17 +57,25 @@ exports.listBooks = async (req, res) => {
 // Affichage d'un livre par ID
 exports.getBookById = async (req, res) => {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params);
 
-      const book = await Book.findByPk(id, {
-      include: [{
-        model: Type,
-        as: 'type',
-        attributes: ['id', 'name']
-      }]
-       });
-    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "id invalide",
+        data: null,
+      });
+    }
 
+    const book = await Book.findByPk(id, {
+      include: [
+        {
+          model: Type,
+          as: "type",
+          attributes: ["id", "Name"],
+        },
+      ],
+    });
 
     if (!book) {
       return res.status(404).json({
@@ -92,22 +103,44 @@ exports.getBookById = async (req, res) => {
 // Ajout d'un livre
 exports.createBook = async (req, res) => {
   try {
-    const { title, author, type_id } = req.body;
+    const { title, author, typeId } = req.body;
 
-    // validation des données
-    if (!title || !author || !type_id) {
+    // validation avec ton schéma (si tu l'as mis en place)
+    if (validateCreateBook) {
+      const { error } = validateCreateBook(req.body);
+      if (error) {
+        return res.status(400).json({
+          success: false,
+          message: error.details[0].message,
+          data: null,
+        });
+      }
+    }
+
+    // validation simple au cas où
+    if (!title || !author || !typeId) {
       return res.status(400).json({
         success: false,
-        message: "les champs 'title' et 'author' sont obligatoires",
+        message: "les champs 'title', 'author' et 'typeId' sont obligatoires",
+        data: null,
+      });
+    }
+
+    // optionnel : vérifier que le type existe
+    const type = await Type.findByPk(typeId);
+    if (!type) {
+      return res.status(400).json({
+        success: false,
+        message: "type inexistant",
         data: null,
       });
     }
 
     // création du book en DB
     const newBook = await Book.create({
-      title: title,
-      author: author,
-      type_id: type_id,
+      title,
+      author,
+      typeId, // attention : on utilise bien 'typeId' côté JS
     });
 
     return res.status(201).json({
@@ -128,8 +161,28 @@ exports.createBook = async (req, res) => {
 // Update d'un livre
 exports.updateBook = async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const { title, dispo, type_id } = req.body;
+    const id = parseId(req.params);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "id invalide",
+        data: null,
+      });
+    }
+
+    const { title, dispo, typeId } = req.body;
+
+    if (validateUpdateBook) {
+      const { error } = validateUpdateBook(req.body);
+      if (error) {
+        return res.status(400).json({
+          success: false,
+          message: error.details[0].message,
+          data: null,
+        });
+      }
+    }
 
     const book = await Book.findByPk(id);
 
@@ -141,10 +194,22 @@ exports.updateBook = async (req, res) => {
       });
     }
 
+    // si on change le type, on vérifie qu’il existe
+    if (typeId !== undefined) {
+      const type = await Type.findByPk(typeId);
+      if (!type) {
+        return res.status(400).json({
+          success: false,
+          message: "type inexistant",
+          data: null,
+        });
+      }
+      book.typeId = typeId;
+    }
+
     // appliquer les modifications
     if (title !== undefined) book.title = title;
     if (dispo !== undefined) book.dispo = dispo;
-    if (type_id !== undefined) book.type_id = type_id;
 
     await book.save();
 
@@ -166,7 +231,15 @@ exports.updateBook = async (req, res) => {
 // Suppression d'un livre
 exports.deleteBook = async (req, res) => {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "id invalide",
+        data: null,
+      });
+    }
 
     const book = await Book.findByPk(id);
 
