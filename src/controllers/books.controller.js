@@ -72,10 +72,10 @@ exports.getBookById = async (req, res) => {
 // Ajout d'un livre
 exports.createBook = async (req, res) => {
   try {
-    const { title, author } = req.body;
+    const { title, author, type_id } = req.body;
 
     // validation des données
-    if (!title || !author) {
+    if (!title || !author || !type_id) {
       return res.status(400).json({
         success: false,
         message: "les champs 'title' et 'author' sont obligatoires",
@@ -87,6 +87,8 @@ exports.createBook = async (req, res) => {
     const newBook = await Book.create({
       title: title,
       author: author,
+      type_id: type_id,
+      
     });
 
     return res.status(201).json({
@@ -108,7 +110,7 @@ exports.createBook = async (req, res) => {
 exports.updateBook = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { title, dispo } = req.body;
+    const { title, dispo,type_id } = req.body;
 
     const book = await Book.findByPk(id);
 
@@ -123,6 +125,7 @@ exports.updateBook = async (req, res) => {
     // appliquer les modifications
     if (title !== undefined) book.title = title;
     if (dispo !== undefined) book.dispo = dispo;
+    if(type_id !== undefined)book.type_id = type_id;
 
     await book.save();
 

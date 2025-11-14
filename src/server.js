@@ -4,6 +4,7 @@ const app = require('./app');
 const PORT = process.env.PORT;
 
 
+
 if (!PORT) {
   console.log("PORT absent, veuillez compléter le fichier .env");
   process.exit(1);
