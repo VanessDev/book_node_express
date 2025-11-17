@@ -1,3 +1,4 @@
+// Ce fichier peut se faire dans middlewares aussi (comme Atif nous l'a montré)
 const multer = require("multer");
 const path = require("path");
 
