@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Type",
-      tableName: "types",           // 👈 on force bien le nom de la table SQL
+      tableName: "types",           
       underscored: true,
       timestamps: true,
       createdAt: "created_at",
