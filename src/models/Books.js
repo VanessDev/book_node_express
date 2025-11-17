@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "types",   // ✔️ corrigé ! (table réelle)
+          model: "types",   
           key: "id"
         }
       },
@@ -55,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       cover_url: {
         type: DataTypes.STRING,
         allowNull: true,
+        len:[1,155]
       },
     },
 
