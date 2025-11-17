@@ -293,10 +293,13 @@ exports.uploadCover = async (req, res) => {
       });
     }
 
-    // chemin du fichier stocké (relatif, stocké en DB)
+    // je construis le chemin de l'image qui vient d'être uploadé
+    //req.file.filename : contient le nom du fichier généré par Multer.
     const imagePath = `/uploads/${req.file.filename}`;
 
+    // J’enregistre ce chemin dans l’objet book récupéré depuis la base.
     book.cover_url = imagePath;
+    // Je sauvegarde les modifications en base de données.
     await book.save();
 
     return res.status(200).json({
@@ -317,6 +320,7 @@ exports.uploadCover = async (req, res) => {
     });
   }
 };
+
 
 // =====================
 // Test de la connexion + modèle
