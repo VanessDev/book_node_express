@@ -14,3 +14,13 @@ if (!PORT) {
 app.listen(PORT, () =>
   console.log(`Serveur lancé sur http://localhost:${PORT}`)
 );
+
+app.get("/test-form-upload", (req, res) => {
+  res.send(`
+    <h1>Test upload</h1>
+    <form action="/monapi/books/test-upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="image" />
+      <button type="submit">Uploader</button>
+    </form>
+  `);
+});

@@ -42,16 +42,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
+
       type_id: {
         type: DataTypes.INTEGER,
-        allowNull:true,
-        references:{
-          model: "type",
-          key:"id"
+        allowNull: true,
+        references: {
+          model: "types",   // ✔️ corrigé ! (table réelle)
+          key: "id"
         }
-      }
+      },
 
-    
+      cover_url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
 
     {

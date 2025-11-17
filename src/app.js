@@ -1,25 +1,34 @@
-//import du packet express et des autres
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const router = require("./routes");
 const notFound = require('./middlewares/notFound');
+const path = require("path");
 
-//crée l'application express
 const app = express();
 
-//autoriser les request cross origin
+// fichiers statiques /uploads
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 app.use(cors());
-// parse le contenu du body de ma request (req.body)
 app.use(express.json());
-//log les request http
 app.use(morgan('dev'));
 
-//chercher toutes mes routes (sous la route /monApi)
+// ✅ route de test pour l’upload (via navigateur)
+app.get("/test-form-upload", (req, res) => {
+  res.send(`
+    <h1>Test upload</h1>
+    <form action="/monapi/books/test-upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="image" />
+      <button type="submit">Uploader</button>
+    </form>
+  `);
+});
+
+// toutes les routes de l'API sous /monapi
 app.use('/monapi', router);
 
-//je recupere la requet qui n'a pas trouvé de route
+// 404
 app.use(notFound);
 
-//export app
 module.exports = app;
