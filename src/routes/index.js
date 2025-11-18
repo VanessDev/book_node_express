@@ -1,14 +1,14 @@
-//extrait router de express
-const { Router } = require('express');
+// src/routes/index.js
+const express = require("express");
+const router = express.Router();
 
-//crée le routeur
-const router = Router();
+const booksRoutes = require("./books.routes");
+const authRoutes = require("./auth.routes");
 
-//montage des sous routes
-//route produits /monapi/products
-router.use('/books', require('./books.routes'));
+// /monapi/books/...
+router.use("/books", booksRoutes);
 
-//exporte le routeur
+// /monapi/auth/...
+router.use("/auth", authRoutes);
+
 module.exports = router;
-
-

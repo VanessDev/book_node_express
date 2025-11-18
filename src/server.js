@@ -2,6 +2,10 @@ require("dotenv").config();
 
 const app = require('./app');
 const PORT = process.env.PORT;
+const authRoutes=require("./routes/auth.routes");
+
+//utiliser les routes d'auth
+app.use(authRoutes);
 
 
 
