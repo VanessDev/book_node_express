@@ -41,7 +41,7 @@ async function validateCredentials(email, password) {
 function generateToken(user) {
   return jwt.sign(
     { sub: user.id }, // tu peux limiter au strict minimum
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET, //la clé secrete pour signer le token 
     { expiresIn: "24h" }
   );
 }
