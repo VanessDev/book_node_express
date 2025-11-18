@@ -293,7 +293,8 @@ function BooksPage({ token }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, author }), // adapte aux champs de ton back
+      body: JSON.stringify({ title, author, typeId: 1 }), // ou l'ID qui existe en BDD
+
       });
 
       if (!res.ok) {

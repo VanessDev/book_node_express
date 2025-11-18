@@ -5,18 +5,18 @@ module.exports = (sequelize, DataTypes) => {
   class Type extends Model {
     static associate(models) {
       // Un type peut avoir plusieurs livres
-      this.hasMany(models.Books, {
-        foreignKey: "type_id", // colonne dans la table books
-        as: "books",
-      });
+      // On vérifie que le modèle Book existe bien
+      if (models.Book) {
+        this.hasMany(models.Book, {
+          foreignKey: "typeId", // nom de la propriété dans le modèle Book
+          as: "books",
+        });
+      }
     }
   }
 
   Type.init(
     {
-      // id sera créé automatiquement (id, autoIncrement, PK) 
-      // si ta table le respecte côté MySQL
-
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -25,11 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Type",
-      tableName: "types",           
-      underscored: true,
+      tableName: "types",
       timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
     }
   );
 
