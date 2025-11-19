@@ -5,10 +5,15 @@ const router = express.Router();
 const booksRoutes = require("./books.routes");
 const authRoutes = require("./auth.routes");
 
-// /monapi/books/...
-router.use("/books", booksRoutes);
+const authMiddleware = require("../middlewares/auth.middleware");
 
-// /monapi/auth/...
-router.use("/auth", authRoutes);
+// ROUTES PUBLIQUES
+
+router.use("/auth", authRoutes);   // register / login
+
+
+// ROUTES PROTÉGÉES
+
+router.use("/books", authMiddleware, booksRoutes);
 
 module.exports = router;
