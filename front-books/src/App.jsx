@@ -3,16 +3,11 @@ import { useEffect, useState } from "react";
 const API_URL = "http://localhost:3000/monapi";
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [view, setView] = useState("login"); // 'login' | 'register' | 'books'
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (savedToken) {
-      setToken(savedToken);
-      setView("books");
-    }
-  }, []);
+  // On lit localStorage UNE SEULE FOIS grâce à la fonction passée à useState
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [view, setView] = useState(() =>
+    localStorage.getItem("token") ? "books" : "login"
+  ); // 'login' | 'register' | 'books'
 
   function handleLogout() {
     setToken(null);
@@ -293,8 +288,7 @@ function BooksPage({ token }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      body: JSON.stringify({ title, author, typeId: 1 }), // ou l'ID qui existe en BDD
-
+        body: JSON.stringify({ title, author, typeId: 1 }), // adapte l'ID si besoin
       });
 
       if (!res.ok) {

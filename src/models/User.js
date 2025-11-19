@@ -39,8 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'User',
 
-      // 🚨 TRÈS IMPORTANT :
-      // correspond EXACTEMENT au nom de ta table créée par la migration
+    
       tableName: 'Users',
 
       // ⚠️ ON NE MET PLUS:
